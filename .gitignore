@@ -1,11 +1,74 @@
+# Environment variables (CRITICAL - contains API keys and credentials)
 .env
+.env.local
+.env.production
+.env.development
+*.env
+backend/.env
+frontend/.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 /app/__pycache__
 /app/services/__pycache__
 /app/routers/__pycache__
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+
+# Video recording (contains assignment-specific content)
+VIDEO_GUIDE.md
+*.mp4
+*.mov
+*.avi
+recordings/
+
+# Old documentation (cleanup)
 SETUP.md
 check_gemini_models.py
 FEATURES.md
 IMPROVEMENTS.md
-
 README-BACKEND.md
 README-FRONTEND.md
+
+# Backup files
+*.bak
+*_old.py
+*_backup.*
+llm_generator_old.py
