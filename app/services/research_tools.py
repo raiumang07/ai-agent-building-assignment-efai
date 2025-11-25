@@ -4,12 +4,91 @@ import feedparser
 import wikipedia
 import re
 from urllib.parse import urlencode, quote_plus, urljoin
+import yfinance as yf
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"}
 
 # -------------------------
-# Wikipedia detailed extract
+# Yahoo Finance using yfinance library (RELIABLE METHOD)
 # -------------------------
+def fetch_yahoo_finance_data(company: str):
+    """
+    Fetch financial data using yfinance library.
+    Much more reliable than web scraping.
+    """
+    try:
+        # Try to find ticker by searching common formats
+        possible_tickers = [
+            company.upper(),  # Direct company name
+            company.split()[0].upper(),  # First word
+        ]
+        
+        # Try to get ticker from Wikipedia first
+        try:
+            wiki_page = wikipedia.page(company, auto_suggest=True)
+            # Extract ticker from page content
+            content = wiki_page.content
+            ticker_match = re.search(r'(?:ticker|symbol)[:|\s]+([A-Z]{1,5})', content, re.IGNORECASE)
+            if ticker_match:
+                possible_tickers.insert(0, ticker_match.group(1))
+        except:
+            pass
+        
+        # Try each possible ticker
+        for ticker_symbol in possible_tickers:
+            try:
+                ticker = yf.Ticker(ticker_symbol)
+                info = ticker.info
+                
+                # Check if we got valid data
+                if info and info.get('symbol'):
+                    result = {
+                        "ticker": info.get('symbol'),
+                        "Market Cap": info.get('marketCap'),
+                        "Revenue (TTM)": info.get('totalRevenue'),
+                        "Net Income": info.get('netIncomeToCommon'),
+                        "Profit Margin": info.get('profitMargins'),
+                        "EPS (TTM)": info.get('trailingEps'),
+                        "PE Ratio (TTM)": info.get('trailingPE'),
+                        "Forward PE": info.get('forwardPE'),
+                        "Price to Book": info.get('priceToBook'),
+                        "Dividend Yield": info.get('dividendYield'),
+                        "52 Week High": info.get('fiftyTwoWeekHigh'),
+                        "52 Week Low": info.get('fiftyTwoWeekLow'),
+                        "Current Price": info.get('currentPrice'),
+                        "Target Price": info.get('targetMeanPrice'),
+                        "Employees": info.get('fullTimeEmployees'),
+                        "Industry": info.get('industry'),
+                        "Sector": info.get('sector'),
+                        "Website": info.get('website'),
+                        "Business Summary": info.get('longBusinessSummary'),
+                        "City": info.get('city'),
+                        "Country": info.get('country'),
+                    }
+                    
+                    # Format large numbers
+                    if result["Market Cap"]:
+                        result["Market Cap"] = f"${result['Market Cap']:,.0f}"
+                    if result["Revenue (TTM)"]:
+                        result["Revenue (TTM)"] = f"${result['Revenue (TTM)']:,.0f}"
+                    if result["Net Income"]:
+                        result["Net Income"] = f"${result['Net Income']:,.0f}"
+                    if result["Profit Margin"]:
+                        result["Profit Margin"] = f"{result['Profit Margin']:.2%}"
+                    if result["Dividend Yield"]:
+                        result["Dividend Yield"] = f"{result['Dividend Yield']:.2%}"
+                    
+                    print(f"✓ Yahoo Finance data fetched for {ticker_symbol}")
+                    return result
+            except Exception as e:
+                continue
+        
+        return {"error": f"Could not find ticker for {company}"}
+    
+    except Exception as e:
+        return {"error": f"Yahoo Finance yfinance failed: {str(e)}"}
+
+
 def fetch_wikipedia_detailed(company: str):
     try:
         wikipedia.set_lang("en")

@@ -1,8 +1,7 @@
 from fastapi import APIRouter
 from app.services.research_tools import (
     fetch_wikipedia_detailed,
-    find_yahoo_finance_url,
-    scrape_yahoo_financials,
+    fetch_yahoo_finance_data,  # NEW: Reliable yfinance method
     ddg_instant_answers,
     scrape_company_website,
     fetch_news_rss
@@ -16,11 +15,8 @@ async def get_company_info(company: str):
     # 1) Wikipedia
     wiki = fetch_wikipedia_detailed(company)
 
-    # 2) Yahoo Finance: find the ticker/url then scrape numeric fields
-    yahoo_url = find_yahoo_finance_url(company)
-    yahoo_fin = None
-    if yahoo_url:
-        yahoo_fin = scrape_yahoo_financials(yahoo_url)
+    # 2) Yahoo Finance using yfinance library (RELIABLE)
+    yahoo_fin = fetch_yahoo_finance_data(company)
 
     # 3) DuckDuckGo instant financial answers (short snippets)
     ddg = ddg_instant_answers(company)
@@ -33,7 +29,6 @@ async def get_company_info(company: str):
 
     raw = {
         "wikipedia": wiki,
-        "yahoo_finance_url": yahoo_url,
         "yahoo_finance": yahoo_fin,
         "ddg": ddg,
         "website": website,
