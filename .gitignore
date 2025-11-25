@@ -1,0 +1,11 @@
+.env
+/app/__pycache__
+/app/services/__pycache__
+/app/routers/__pycache__
+SETUP.md
+check_gemini_models.py
+FEATURES.md
+IMPROVEMENTS.md
+
+README-BACKEND.md
+README-FRONTEND.md
